@@ -47,6 +47,7 @@ void engine_draw_circle(int center_x, int center_y, float radius) {
 
 void engine_draw_circle_lines(int center_x, int center_y, float radius) {
     DrawCircleLines(center_x, center_y, radius, BLACK);
+    DrawCircleLines(center_x, center_y, radius - 1, BLACK);
 }
 
 void engine_draw_rectangle(int pos_x, int pos_y, int width, int height) {
