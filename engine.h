@@ -24,6 +24,7 @@ void  engine_init_graphics(int width, int height);
 void  engine_deinit_graphics();
 void  engine_begin_drawing();
 void  engine_end_drawing();
+float engine_get_delta_time();
 
 int   engine_is_button_pressed(int button);
 float engine_get_shot_power(int screen_height);

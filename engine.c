@@ -17,6 +17,10 @@ void engine_end_drawing() {
     EndDrawing();
 }
 
+float engine_get_delta_time() {
+    return GetFrameTime();
+}
+
 int engine_is_button_pressed(int button) {
     return IsKeyDown(button);
 }

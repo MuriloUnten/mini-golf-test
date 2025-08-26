@@ -83,7 +83,7 @@ void init_game_state(Game_state* state) {
 }
 
 void update_state(Game_state* state) {
-    state->dt = 1000.0 / GetFPS();
+    state->dt = engine_get_delta_time();
 
     float delta_theta = 0.005 * state->dt;
     if (engine_is_button_pressed(KEY_COUNTER_CLOCKWISE)) {
