@@ -1,2 +1,2 @@
 all:
-	gcc -o main main.c -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
+	gcc -o main main.c engine.c -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
