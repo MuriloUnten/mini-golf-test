@@ -34,22 +34,26 @@ float engine_get_shot_power(int screen_height) {
 }
 
 void engine_clear_background() {
-    ClearBackground(GREEN);
+    ClearBackground((Color){ 67, 84, 60 });
 }
 
 void engine_draw_fps() {
     DrawFPS(5, 5);
 }
 
-void engine_draw_circle(int center_x, int center_y, float radius, Color color) {
-    DrawCircle(center_x, center_y, radius, color);
+void engine_draw_circle(int center_x, int center_y, float radius) {
+    DrawCircle(center_x, center_y, radius, BLACK);
 }
 
-void engine_draw_rectangle(int pos_x, int pos_y, int width, int height, Color color) {
-    DrawRectangle(pos_x, pos_y, width, height, color);
+void engine_draw_circle_lines(int center_x, int center_y, float radius) {
+    DrawCircleLines(center_x, center_y, radius, BLACK);
 }
 
-void engine_draw_rectangle_rect(Engine_rectangle rect, Color color) {
+void engine_draw_rectangle(int pos_x, int pos_y, int width, int height) {
+    DrawRectangle(pos_x, pos_y, width, height, BLACK);
+}
+
+void engine_draw_rectangle_rect(Engine_rectangle rect) {
     Rectangle raylib_rect = {
         .x = rect.x,
         .y = rect.y,
@@ -57,9 +61,20 @@ void engine_draw_rectangle_rect(Engine_rectangle rect, Color color) {
         .height = rect.height,
     };
 
-    DrawRectangleRec(raylib_rect, color);
+    DrawRectangleRec(raylib_rect, BLACK);
 }
 
-void engine_draw_line(Engine_vector2f start_pos, Engine_vector2f end_pos, Color color) {
-    DrawLineV((Vector2){ start_pos.x, start_pos.y }, (Vector2){ end_pos.x, end_pos.y }, color);
+void engine_draw_rectangle_rect_lines(Engine_rectangle rect) {
+    Rectangle raylib_rect = {
+        .x = rect.x,
+        .y = rect.y,
+        .width = rect.width,
+        .height = rect.height,
+    };
+
+    DrawRectangleLinesEx(raylib_rect, 4, BLACK);
+}
+
+void engine_draw_line(Engine_vector2f start_pos, Engine_vector2f end_pos) {
+    DrawLineEx((Vector2){ start_pos.x, start_pos.y }, (Vector2){ end_pos.x, end_pos.y }, 2, BLACK);
 }
