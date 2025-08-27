@@ -2,6 +2,7 @@
 
 #define KEY_COUNTER_CLOCKWISE KEY_J
 #define KEY_CLOCKWISE KEY_K
+#define KEY_SHOOT KEY_SPACE
 
 typedef struct {
     float x;
