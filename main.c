@@ -4,15 +4,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define SCREEN_WIDTH 720
-#define SCREEN_HEIGHT 360
+#define WINDOW_WIDTH  720
+#define WINDOW_HEIGHT 360
 
 #define BALL_RADIUS 10.0
 #define TRACER_LENGTH 60.0
 #define TRACER_BALL_DISTANCE (2 * BALL_RADIUS)
 #define HOLE_RADIUS 30.0
-#define POWER_BAR_HEIGHT (4 * SCREEN_HEIGHT / 6.0)
-#define POWER_BAR_WIDTH  (SCREEN_HEIGHT / 12.0)
+#define POWER_BAR_HEIGHT (4 * WINDOW_HEIGHT / 6.0)
+#define POWER_BAR_WIDTH  (WINDOW_HEIGHT / 12.0)
+#define BORDER_THICKNESS (WINDOW_HEIGHT / 36.0)
 
 typedef struct {
     Engine_vector2f pos;
@@ -38,12 +39,17 @@ typedef struct {
 } Power_bar;
 
 typedef struct {
+    Entity* data;
+    int size;
+} Entity_array;
+
+typedef struct {
     float dt;
     Ball ball;
     Tracer tracer;
     Engine_rectangle power_bar;
     Entity hole;
-    Entity* obstacles;
+    Entity_array obstacles;
 } Game_state;
 
 int ball_is_shooting(Game_state* state) {
@@ -58,7 +64,7 @@ void init_game_state(Game_state* state) {
     state->dt = 0.0;
 
     Ball ball = {
-        .pos = { 150.0, (SCREEN_HEIGHT / 2.0) },
+        .pos = { 150.0, (WINDOW_HEIGHT / 2.0) },
         .vel = { 0.0, 0.0 },
         .radius = BALL_RADIUS,
         .aim_direction = { 1.0, 0.0 },
@@ -81,19 +87,55 @@ void init_game_state(Game_state* state) {
 
     Engine_rectangle power_bar = {
         .x = 30,
-        .y = (SCREEN_HEIGHT / 6.0),
+        .y = (WINDOW_HEIGHT / 6.0),
         . width = POWER_BAR_WIDTH,
         .height = POWER_BAR_HEIGHT,
     };
     state->power_bar = power_bar;
 
     Entity hole = {
-        .pos  = { 600.0, (SCREEN_HEIGHT / 2.0) },
+        .pos  = { 600.0, (WINDOW_HEIGHT / 2.0) },
         .size = { HOLE_RADIUS, HOLE_RADIUS },
     };
     state->hole = hole;
 
-    state->obstacles = malloc(10 * sizeof(Entity));
+    state->obstacles.data = malloc(10 * sizeof(Entity));
+    state->obstacles.size = 0;
+    Entity left_border = {
+        .pos.x  = 0.0,
+        .pos.y  = 0.0,
+        .size.x = BORDER_THICKNESS,
+        .size.y = WINDOW_HEIGHT,
+    };
+    state->obstacles.data[0] = left_border;
+    state->obstacles.size++;
+
+    Entity right_border = {
+        .pos.x  = WINDOW_WIDTH - BORDER_THICKNESS,
+        .pos.y  = 0.0,
+        .size.x = BORDER_THICKNESS,
+        .size.y = WINDOW_HEIGHT,
+    };
+    state->obstacles.data[1] = right_border;
+    state->obstacles.size++;
+
+    Entity top_border = {
+        .pos.x  = 0.0,
+        .pos.y  = 0.0,
+        .size.x = WINDOW_WIDTH,
+        .size.y = BORDER_THICKNESS,
+    };
+    state->obstacles.data[2] = top_border;
+    state->obstacles.size++;
+
+    Entity bottom_border = {
+        .pos.x  = 0.0,
+        .pos.y  = WINDOW_HEIGHT - BORDER_THICKNESS,
+        .size.x = WINDOW_WIDTH,
+        .size.y = BORDER_THICKNESS,
+    };
+    state->obstacles.data[3] = bottom_border;
+    state->obstacles.size++;
 }
 
 void shoot(Game_state* state) {
@@ -145,16 +187,20 @@ void update_state(Game_state* state) {
         state->ball.pos.y += state->dt * state->ball.vel.y;
     }
 
-    state->ball.power = engine_get_shot_power(SCREEN_HEIGHT);
+    state->ball.power = engine_get_shot_power(WINDOW_HEIGHT);
 }
 
 void render(Game_state* state) {
     engine_begin_drawing();
 
     engine_clear_background();
-    engine_draw_fps();
 
     { // Draw entities
+        for (int i = 0; i < state->obstacles.size; i++) {
+            Entity* obs = &state->obstacles.data[i];
+            engine_draw_rectangle(obs->pos.x, obs->pos.y, obs->size.x, obs->size.y);
+        }
+
         engine_draw_circle_lines(state->ball.pos.x, state->ball.pos.y, state->ball.radius);
         engine_draw_circle(state->hole.pos.x, state->hole.pos.y, state->hole.size.x / 2.0);
     }
@@ -168,13 +214,14 @@ void render(Game_state* state) {
 
         Engine_rectangle power_rect = {
             .x = 30.0,
-            .y = (SCREEN_HEIGHT - (SCREEN_HEIGHT / 6.0) - (int)(POWER_BAR_HEIGHT * state->ball.power)),
+            .y = (WINDOW_HEIGHT - (WINDOW_HEIGHT / 6.0) - (int)(POWER_BAR_HEIGHT * state->ball.power)),
             .width = POWER_BAR_WIDTH,
             .height = (int)(POWER_BAR_HEIGHT * state->ball.power),
         };
         engine_draw_rectangle_rect(power_rect);
     }
 
+    engine_draw_fps();
     engine_end_drawing();
 }
 
@@ -183,7 +230,7 @@ int main() {
     Game_state state;
     init_game_state(&state);
 
-    engine_init_graphics(SCREEN_WIDTH, SCREEN_HEIGHT);
+    engine_init_graphics(WINDOW_WIDTH, WINDOW_HEIGHT);
     while (!WindowShouldClose()) {
         update_state(&state);
         render(&state);
